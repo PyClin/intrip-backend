@@ -73,7 +73,7 @@ class WalletBalance(CreateAPIView):
             wallet = user.wallet
             balance = GGHelper().wallet_balance(wallet.id)
             return Response(data={
-                "balance": balance
+                "amount": balance
             }, status=status.HTTP_200_OK)
         except Exception:
             print(traceback.format_exc())
