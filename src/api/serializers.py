@@ -40,6 +40,7 @@ class TicketCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = (
+            'id',
             'ticket_id',
             'from_user',
             'to_user',
