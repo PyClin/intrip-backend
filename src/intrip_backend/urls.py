@@ -15,8 +15,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+
+@api_view(["GET"])
+def health(request):
+    return Response(status=status.HTTP_200_OK)
 
 urlpatterns = [
+    path('health', health),
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
 ]
