@@ -6,9 +6,10 @@ from rest_framework import status, serializers
 from rest_framework.generics import CreateAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenViewBase
 
 from api.models import Wallet, Ticket, TicketClaimMapping
-from api.serializers import TicketListSerializer, TicketCreateSerializer
+from api.serializers import TicketListSerializer, TicketCreateSerializer, CustomTokenObtainPairSerializer
 from api.utils import GGHelper
 
 
@@ -195,3 +196,11 @@ class ClaimMoney(CreateAPIView):
         except Exception:
             print(traceback.format_exc())
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class TokenObtainPairView(TokenViewBase):
+    """
+    Takes a set of user credentials and returns an access and refresh JSON web
+    token pair to prove the authentication of those credentials.
+    """
+    serializer_class = CustomTokenObtainPairSerializer

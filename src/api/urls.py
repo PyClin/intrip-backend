@@ -1,7 +1,8 @@
 from django.urls import path, include
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenRefreshView
 
-from api.views import ClaimMappingCreate, WalletDeposit, WalletBalance, TicketList, TicketCreate, ClaimMoney
+from api.views import ClaimMappingCreate, WalletDeposit, WalletBalance, TicketList, TicketCreate, ClaimMoney, \
+    TokenObtainPairView
 
 urlpatterns = [
     path('', include('djoser.urls')),

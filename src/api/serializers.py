@@ -1,6 +1,8 @@
 import traceback
 
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainSerializer, TokenObtainPairSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.models import Ticket
 
@@ -50,3 +52,18 @@ class TicketCreateSerializer(serializers.ModelSerializer):
             'source',
             'amount'
         )
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        return RefreshToken.for_user(user)
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        data['user_type'] = self.user.user_type
+        data['id'] = self.user.id
+        data['username'] = self.user.username
+
+        return data
