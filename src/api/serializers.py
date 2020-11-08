@@ -7,7 +7,7 @@ from api.models import Ticket
 
 class TicketListSerializer(serializers.ModelSerializer):
     claimed_status = serializers.SerializerMethodField()
-    timestamp = serializers.DateTimeField(input_formats=["YYYY-mm-dd HH:MM:SS"], format="YYYY-mm-dd HH:MM:SS")
+    timestamp = serializers.DateTimeField(input_formats=["%Y-%m-%d %H:%M:%S"], format="%Y-%m-%d %H:%M:%S")
 
     class Meta:
         model = Ticket
@@ -33,7 +33,9 @@ class TicketListSerializer(serializers.ModelSerializer):
 
 
 class TicketCreateSerializer(serializers.ModelSerializer):
-    timestamp = serializers.DateTimeField(input_formats=["YYYY-mm-dd HH:MM:SS"], format="YYYY-mm-dd HH:MM:SS")
+    timestamp = serializers.DateTimeField(input_formats=["%Y-%m-%d %H:%M:%S"], format="%Y-%m-%d %H:%M:%S")
+    from_user = serializers.CharField(read_only=True)
+    txn_hash = serializers.CharField(read_only=True)
 
     class Meta:
         model = Ticket

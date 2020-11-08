@@ -99,7 +99,10 @@ class GGHelper:
                 response = requests.post(url, data=json.dumps(data), headers=headers, timeout=10)
                 if is_success(response.status_code):
                     print(f"Response from gg: {response.content}")
-                    break
+                    content = response.json()
+                    txn_hash = content["txn_hash"]
+                    return txn_hash
                 print(f"Call to GG failed. Trying again")
             except Exception:
                 print(traceback.format_exc())
+            return ""

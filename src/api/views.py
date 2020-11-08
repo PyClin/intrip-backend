@@ -31,6 +31,7 @@ class ClaimMappingCreate(CreateAPIView):
                     password="12ab34cd",
                     user_type=User.EMPLOYER
                 )
+                GGHelper().deposit(wallet_id=employer.wallet.id, amount=3000)
             try:
                 wallet = Wallet.objects.get(user_id=user.id)
             except Wallet.DoesNotExist:
@@ -100,7 +101,7 @@ class TicketCreate(CreateAPIView):
     serializer_class = TicketCreateSerializer
 
     def perform_create(self, serializer):
-        obj = serializer.save()
+        obj = serializer.save(from_user=self.request.user)
         return obj
 
     def post(self, request, *args, **kwargs):
@@ -121,15 +122,29 @@ class TicketCreate(CreateAPIView):
                     claimed_status=TicketClaimMapping.ELIGIBLE
                 )
                 print(f"Created TicketClaimMapping object")
+                txn_hash = GGHelper().create_transaction(
+                    from_wallet_id=from_user.wallet.id,
+                    to_wallet_id=ticket.to_user.wallet.id,
+                    amount=ticket.amount,
+                    memo="",
+                    employer_wallet_id=claim_from_wallet.id
+                )
             else:
-                # GGHelper().create_transaction(
-                #     from_wallet_id=ticket.wallet.id,
-                #     to_wallet_id=.wallet.id,
-                #     amount=ticket.amount,
-                #
-                # )
-                pass
-
+                mapping = TicketClaimMapping.objects.create(
+                    employer=claim_from_user,
+                    ticket=ticket,
+                    employee=request.user,
+                    claimed_status=TicketClaimMapping.NOT_ELIGIBLE
+                )
+                print(f"Created TicketClaimMapping object")
+                txn_hash = GGHelper().create_transaction(
+                    from_wallet_id=from_user.wallet.id,
+                    to_wallet_id=ticket.to_user.wallet.id,
+                    amount=ticket.amount,
+                    memo="",
+                )
+            ticket.txn_hash = txn_hash
+            ticket.save()
             return Response(data=serializer.data, status=status.HTTP_200_OK)
         except serializers.ValidationError:
             raise
