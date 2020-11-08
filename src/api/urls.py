@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from api.views import ClaimMappingCreate, WalletDeposit, WalletBalance, TicketList, TicketCreate
+from api.views import ClaimMappingCreate, WalletDeposit, WalletBalance, TicketList, TicketCreate, ClaimMoney
 
 urlpatterns = [
     path('', include('djoser.urls')),
@@ -11,5 +11,6 @@ urlpatterns = [
     path('deposit/', WalletDeposit.as_view(), name="wallet_deposit"),
     path('balance/', WalletBalance.as_view(), name="wallet_balance"),
     path('ticket/list/', TicketList.as_view(), name="ticket_list"),
-    path('ticket/create/', TicketCreate.as_view(), name="ticket_create")
+    path('ticket/create/', TicketCreate.as_view(), name="ticket_create"),
+    path('claim/create/', ClaimMoney.as_view(), name="claim_money"),
 ]

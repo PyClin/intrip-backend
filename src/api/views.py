@@ -1,11 +1,8 @@
 import traceback
 
 from django.contrib.auth import get_user_model
-from django.shortcuts import render
 
-# Create your views here.
 from rest_framework import status, serializers
-from rest_framework.decorators import api_view
 from rest_framework.generics import CreateAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
@@ -153,4 +150,37 @@ class TicketCreate(CreateAPIView):
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+class ClaimMoney(CreateAPIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
+    def post(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            ids = data.get("ids")
+            if not ids:
+                return Response(data={
+                    "err_msg": "ids field not present",
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            hashes = []
+            for id in ids:
+                ticket = Ticket.objects.get(id=id)
+                ticket.claims.claimed_status = TicketClaimMapping.RAISED
+                ticket.claims.save()
+
+                hashes.append(ticket.txn_hash)
+            print(f"All ticket ids status set to RAISED")
+            amount = GGHelper().employee_claim(wallet_id=request.user.wallet.id, hashes=hashes)
+
+            for id in ids:
+                ticket = Ticket.objects.get(id=id)
+                ticket.claims.claimed_status = TicketClaimMapping.SUCCESS
+                ticket.claims.save()
+            print(f"All ticket ids status set to SUCCESS")
+
+            return Response(data={
+                "amount": amount,
+            }, status=status.HTTP_200_OK)
+        except Exception:
+            print(traceback.format_exc())
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

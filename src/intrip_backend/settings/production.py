@@ -17,3 +17,7 @@ DATABASES = {
         'PORT': config("DB_PORT"),
     }
 }
+
+GG_CONF = {
+    "url": f"{config('GG_HOST')}:{config('GG_PORT')}"
+}
