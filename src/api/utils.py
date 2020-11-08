@@ -75,7 +75,6 @@ class GGHelper:
                     print(f"Response from gg: {response.content}")
                     content = response.json()
                     return content["balance"]
-                    break
                 print(f"Call to GG failed. Trying again")
             except Exception:
                 print(traceback.format_exc())

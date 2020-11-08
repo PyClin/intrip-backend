@@ -57,8 +57,8 @@ class WalletDeposit(CreateAPIView):
             user = request.user
             wallet = user.wallet
             GGHelper().deposit(wallet_id=wallet.id, amount=amount)
-
-            return Response(status=status.HTTP_200_OK)
+            amount = GGHelper().wallet_balance(wallet_id=wallet.id)
+            return Response(data={"amount": amount}, status=status.HTTP_200_OK)
         except Exception:
             print(traceback.format_exc())
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
