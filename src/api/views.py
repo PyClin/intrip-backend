@@ -106,6 +106,11 @@ class TicketCreate(CreateAPIView):
         try:
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
+
+            if Ticket.objects.filter(ticket_id=request.data.get("ticket_id")).exists():
+                print(f"Already exists")
+                return Response(data=serializer.data, status=status.HTTP_200_OK)
+
             ticket = self.perform_create(serializer)
 
             from_user = ticket.from_user
