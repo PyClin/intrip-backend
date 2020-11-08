@@ -36,7 +36,7 @@ class GGHelper:
         }
         for i in range(5):
             try:
-                response = requests.post(url, data=json.dumps(data), headers=headers, timeout=10)
+                response = requests.post(url, data=json.dumps(data), headers=headers, timeout=15)
                 if is_success(response.status_code):
                     print(f"Response from gg: {response.content}")
                     break
@@ -56,7 +56,7 @@ class GGHelper:
         for i in range(5):
             try:
                 print(f"data={data}")
-                response = requests.post(url, data=json.dumps(data), headers=headers, timeout=10)
+                response = requests.post(url, data=json.dumps(data), headers=headers, timeout=15)
                 if is_success(response.status_code):
                     print(f"Response from gg: {response.content}")
                     break
@@ -70,7 +70,7 @@ class GGHelper:
 
         for i in range(5):
             try:
-                response = requests.get(url, timeout=10)
+                response = requests.get(url, timeout=15)
                 if is_success(response.status_code):
                     print(f"Response from gg: {response.content}")
                     content = response.json()
@@ -97,7 +97,7 @@ class GGHelper:
         for i in range(5):
             try:
                 print(f"data={data}")
-                response = requests.post(url, data=json.dumps(data), headers=headers, timeout=10)
+                response = requests.post(url, data=json.dumps(data), headers=headers, timeout=15)
                 if is_success(response.status_code):
                     print(f"Response from gg: {response.content}")
                     content = response.json()
@@ -123,7 +123,7 @@ class GGHelper:
         for i in range(5):
             try:
                 print(f"data={data}")
-                response = requests.post(url, data=json.dumps(data), headers=headers, timeout=10)
+                response = requests.post(url, data=json.dumps(data), headers=headers, timeout=15)
                 if is_success(response.status_code):
                     print(f"Response from gg: {response.content}")
                     content = response.json()
