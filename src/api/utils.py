@@ -55,6 +55,7 @@ class GGHelper:
         }
         for i in range(5):
             try:
+                print(f"data={data}")
                 response = requests.post(url, data=json.dumps(data), headers=headers, timeout=10)
                 if is_success(response.status_code):
                     print(f"Response from gg: {response.content}")
@@ -96,6 +97,7 @@ class GGHelper:
 
         for i in range(5):
             try:
+                print(f"data={data}")
                 response = requests.post(url, data=json.dumps(data), headers=headers, timeout=10)
                 if is_success(response.status_code):
                     print(f"Response from gg: {response.content}")
@@ -121,6 +123,7 @@ class GGHelper:
 
         for i in range(5):
             try:
+                print(f"data={data}")
                 response = requests.post(url, data=json.dumps(data), headers=headers, timeout=10)
                 if is_success(response.status_code):
                     print(f"Response from gg: {response.content}")

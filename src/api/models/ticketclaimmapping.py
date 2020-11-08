@@ -20,9 +20,9 @@ class TicketClaimMapping(models.Model):
         (NOT_ELIGIBLE, _("Not Eligible")),
         (ELIGIBLE, _("Eligible")),
     ]
-    employer = models.ForeignKey(get_user_model(), related_name="employer_claims", on_delete=models.CASCADE)
+    employer = models.ForeignKey(get_user_model(), related_name="employer_claims", on_delete=models.CASCADE, null=True)
     ticket = models.OneToOneField(Ticket, related_name="claims", on_delete=models.CASCADE)
-    employee = models.ForeignKey(get_user_model(), related_name="employee_claims", on_delete=models.CASCADE)
+    employee = models.ForeignKey(get_user_model(), related_name="employee_claims", on_delete=models.CASCADE, null=True)
     claimed_status = models.CharField(_("Claimed Status"), max_length=32, choices=CLAIMED_STATUS_CHOICES)
 
     def __str__(self):

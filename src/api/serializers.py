@@ -34,7 +34,7 @@ class TicketListSerializer(serializers.ModelSerializer):
 
 class TicketCreateSerializer(serializers.ModelSerializer):
     timestamp = serializers.DateTimeField(input_formats=["%Y-%m-%d %H:%M:%S"], format="%Y-%m-%d %H:%M:%S")
-    from_user = serializers.CharField(read_only=True)
+    to_user = serializers.IntegerField(read_only=True, source="to_user.id")
     txn_hash = serializers.CharField(read_only=True)
 
     class Meta:

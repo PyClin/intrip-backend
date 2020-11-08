@@ -98,7 +98,7 @@ class TicketCreate(CreateAPIView):
     serializer_class = TicketCreateSerializer
 
     def perform_create(self, serializer):
-        obj = serializer.save(from_user=self.request.user)
+        obj = serializer.save(to_user=self.request.user)
         return obj
 
     def post(self, request, *args, **kwargs):
@@ -108,17 +108,28 @@ class TicketCreate(CreateAPIView):
             ticket = self.perform_create(serializer)
 
             from_user = ticket.from_user
-            claim_from_wallet = from_user.wallet.claim_from
-            claim_from_user = claim_from_wallet.user
+            claim_from_wallet = getattr(from_user.wallet, "claim_from", None)
+            claim_from_user = claim_from_wallet.user if hasattr(claim_from_wallet, "user") else None
 
-            if request.user.user_type == "employee":
+            if claim_from_user:
                 mapping = TicketClaimMapping.objects.create(
                     employer=claim_from_user,
                     ticket=ticket,
                     employee=request.user,
                     claimed_status=TicketClaimMapping.ELIGIBLE
                 )
-                print(f"Created TicketClaimMapping object")
+                print(f"Created TicketClaimMapping object with status: TicketClaimMapping.ELIGIBLE")
+            else:
+                mapping = TicketClaimMapping.objects.create(
+                    employer=claim_from_user,
+                    ticket=ticket,
+                    employee=request.user,
+                    claimed_status=TicketClaimMapping.NOT_ELIGIBLE
+                )
+                print(f"Created TicketClaimMapping object with status: TicketClaimMapping.NOT_ELIGIBLE")
+
+            if claim_from_user:
+                print(f"Associate employer for claim")
                 txn_hash = GGHelper().create_transaction(
                     from_wallet_id=from_user.wallet.id,
                     to_wallet_id=ticket.to_user.wallet.id,
@@ -127,13 +138,7 @@ class TicketCreate(CreateAPIView):
                     employer_wallet_id=claim_from_wallet.id
                 )
             else:
-                mapping = TicketClaimMapping.objects.create(
-                    employer=claim_from_user,
-                    ticket=ticket,
-                    employee=request.user,
-                    claimed_status=TicketClaimMapping.NOT_ELIGIBLE
-                )
-                print(f"Created TicketClaimMapping object")
+                print(f"Did not Associate employer for claim")
                 txn_hash = GGHelper().create_transaction(
                     from_wallet_id=from_user.wallet.id,
                     to_wallet_id=ticket.to_user.wallet.id,
@@ -165,17 +170,23 @@ class ClaimMoney(CreateAPIView):
             hashes = []
             for id in ids:
                 ticket = Ticket.objects.get(id=id)
-                ticket.claims.claimed_status = TicketClaimMapping.RAISED
-                ticket.claims.save()
+                if ticket.claims.claimed_status == TicketClaimMapping.ELIGIBLE:
+                    ticket.claims.claimed_status = TicketClaimMapping.RAISED
+                    ticket.claims.save()
+                    hashes.append(ticket.txn_hash)
 
-                hashes.append(ticket.txn_hash)
             print(f"All ticket ids status set to RAISED")
             amount = GGHelper().employee_claim(wallet_id=request.user.wallet.id, hashes=hashes)
 
+
+            if amount is "":
+                return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
             for id in ids:
                 ticket = Ticket.objects.get(id=id)
-                ticket.claims.claimed_status = TicketClaimMapping.SUCCESS
-                ticket.claims.save()
+                if ticket.claims.claimed_status == TicketClaimMapping.RAISED:
+                    ticket.claims.claimed_status = TicketClaimMapping.SUCCESS
+                    ticket.claims.save()
             print(f"All ticket ids status set to SUCCESS")
 
             return Response(data={
