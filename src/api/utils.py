@@ -7,10 +7,10 @@ from rest_framework.status import is_success
 
 
 class GGConstants:
-    EMPLOYER = "employer"
-    STAFF = "staff"
-    EMPLOYEE = "employee"
-    PUBLIC = "public"
+    EMPLOYER = "EMPLOYER"
+    STAFF = "STAFF"
+    EMPLOYEE = "EMPLOYEE"
+    PUBLIC = "PUBLIC"
 
     @staticmethod
     def get_gg_constant(user_type):
@@ -102,6 +102,31 @@ class GGHelper:
                     content = response.json()
                     txn_hash = content["txn_hash"]
                     return txn_hash
+                print(f"Call to GG failed. Trying again")
+            except Exception:
+                print(traceback.format_exc())
+            return ""
+
+
+    def employee_claim(self, wallet_id, hashes):
+        url = f"{settings.GG_CONF['url']}/api/wallet/claim"
+        data = {
+            "wallet_id": int(wallet_id),
+            "txn_hashs": hashes
+        }
+
+        headers = {
+            "Content-Type": "application/json"
+        }
+
+        for i in range(5):
+            try:
+                response = requests.post(url, data=json.dumps(data), headers=headers, timeout=10)
+                if is_success(response.status_code):
+                    print(f"Response from gg: {response.content}")
+                    content = response.json()
+                    amount = content["amount"]
+                    return amount
                 print(f"Call to GG failed. Trying again")
             except Exception:
                 print(traceback.format_exc())
