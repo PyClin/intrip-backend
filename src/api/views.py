@@ -182,6 +182,7 @@ class ClaimMoney(CreateAPIView):
                     hashes.append(ticket.txn_hash)
 
             print(f"All ticket ids status set to RAISED")
+            hashes = [h for h in hashes if h]
             amount = GGHelper().employee_claim(wallet_id=request.user.wallet.id, hashes=hashes)
 
 
