@@ -22,7 +22,8 @@ class TicketListSerializer(serializers.ModelSerializer):
             'source',
             'destination',
             'timestamp',
-            'claimed_status'
+            'claimed_status',
+            'amount',
         )
 
     def get_claimed_status(self, obj):
